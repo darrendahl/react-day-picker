@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import DayPicker from './DayPicker';
+import OverlayPortal from './OverlayPortal';
 import { isSameMonth, isDate } from './DateUtils';
 import { getModifiersForDay } from './ModifiersUtils';
 import { ESC, TAB } from './keys';
@@ -175,6 +176,12 @@ export default class DayPickerInput extends React.Component {
     this.handleMonthChange = this.handleMonthChange.bind(this);
     this.handleOverlayFocus = this.handleOverlayFocus.bind(this);
     this.handleOverlayBlur = this.handleOverlayBlur.bind(this);
+  }
+
+  componentDidMount(){
+    if(this.props.isPortal){
+      window.addEventListener('scroll', this.handleInputBlur);
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -519,6 +526,7 @@ export default class DayPickerInput extends React.Component {
       parseDate,
       formatDate,
       format,
+      isPortal,
     } = this.props;
     const { selectedDays, value } = this.state;
     let selectedDay;
@@ -541,6 +549,41 @@ export default class DayPickerInput extends React.Component {
         );
     }
     const Overlay = this.props.overlayComponent;
+    console.log('hi')
+    if (isPortal) {
+      const rect = this.input.getBoundingClientRect()
+      return (
+        <OverlayPortal>
+          <div style={{
+            position: 'fixed',
+            zIndex: 9999,
+            top: rect.y + this.input.offsetHeight,
+            left: rect.x
+          }}>
+            <Overlay
+              classNames={classNames}
+              month={this.state.month}
+              selectedDay={selectedDay}
+              input={this.input}
+              tabIndex={0} // tabIndex is necessary to catch focus/blur events on Safari
+              onFocus={this.handleOverlayFocus}
+              onBlur={this.handleOverlayBlur}
+            >
+              <DayPicker
+                ref={el => (this.daypicker = el)}
+                onTodayButtonClick={onTodayButtonClick}
+                {...dayPickerProps}
+                month={this.state.month}
+                selectedDays={selectedDay}
+                onDayClick={this.handleDayClick}
+                onMonthChange={this.handleMonthChange}
+              />
+            </Overlay>
+          </div>
+        </OverlayPortal>
+      );
+    }
+
     return (
       <Overlay
         classNames={classNames}

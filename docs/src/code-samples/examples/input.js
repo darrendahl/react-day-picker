@@ -6,7 +6,7 @@ export default function Example() {
   return (
     <div>
       <p>Please type a day:</p>
-      <DayPickerInput onDayChange={day => console.log(day)} />
+      <DayPickerInput isPortal onDayChange={day => console.log(day)} />
     </div>
   );
 }
