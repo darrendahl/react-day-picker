@@ -549,7 +549,6 @@ export default class DayPickerInput extends React.Component {
         );
     }
     const Overlay = this.props.overlayComponent;
-    console.log('hi')
     if (isPortal) {
       const rect = this.input.getBoundingClientRect()
       return (
